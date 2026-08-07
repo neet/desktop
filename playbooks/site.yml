@@ -1,6 +1,6 @@
 ---
 - name: Prepare Desktop
-  hosts: all
+  hosts: localhost
   become: true
   tasks:
     ################################################################################
@@ -14,14 +14,14 @@
 
     - name: Ensure wireless-network config is set
       ansible.builtin.copy:
-        src: 25-wired.network
+        src: 25-wireless.network
         dest: /etc/systemd/network/25-wireless.network
         mode: "0644"
 
     - name: Ensure systemd-networkd is enabled
       ansible.builtin.service:
         name: systemd-resolved
-        enalbed: true
+        enabled: true
         state: started
 
     ################################################################################
@@ -42,7 +42,7 @@
     - name: Ensure systemd-resolved is enabled
       ansible.builtin.service:
         name: systemd-resolved
-        enalbed: true
+        enabled: true
         state: started
 
     ################################################################################
@@ -70,6 +70,9 @@
 
     # TODO: 本来はここで visudo している
     # https://docs.ansible.com/projects/ansible/latest/collections/community/general/sudoers_module.html
+    
+    # TODO: ここの手順2をやる
+    # https://wiki.archlinux.jp/index.php/%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AA%E3%82%BC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3#%E3%83%AD%E3%82%B1%E3%83%BC%E3%83%AB
 
     ################################################################################
     # 開発環境のセットアップ
@@ -79,7 +82,8 @@
         name:
           - neovim
           - gcc
-          - treesitter-cli
+          - direnv
+          - tree-sitter-cli
 
     ################################################################################
     # Bluetooth のセットアップ
@@ -93,7 +97,7 @@
     - name: Ensure bluetooth is enabled
       ansible.builtin.service:
         name: bluetooth
-        enalbed: true
+        enabled: true
         state: started
 
     ################################################################################
