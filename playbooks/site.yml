@@ -1,0 +1,104 @@
+---
+- name: Prepare Desktop
+  hosts: all
+  become: true
+  tasks:
+    ################################################################################
+    # 有線ネットワークまわり
+    ################################################################################
+    - name: Ensure wired-network config is set
+      ansible.builtin.copy:
+        src: 20-wired.network
+        dest: /etc/systemd/network/20-wired.network
+        mode: "0644"
+
+    - name: Ensure wireless-network config is set
+      ansible.builtin.copy:
+        src: 25-wired.network
+        dest: /etc/systemd/network/25-wireless.network
+        mode: "0644"
+
+    - name: Ensure systemd-networkd is enabled
+      ansible.builtin.service:
+        name: systemd-resolved
+        enalbed: true
+        state: started
+
+    ################################################################################
+    # DNS まわり
+    ################################################################################
+    - name: Ensure resolve config is linked
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+
+    - name: Ensure wired-network config is set
+      ansible.builtin.copy:
+        src: 20-wired.network
+        dest: /etc/systemd/network/20-wired.network
+        mode: "0644"
+
+    - name: Ensure systemd-resolved is enabled
+      ansible.builtin.service:
+        name: systemd-resolved
+        enalbed: true
+        state: started
+
+    ################################################################################
+    # 無線ネットワークまわり
+    # WiFiへの接続自体は自分でやったほうがよいか
+    ################################################################################
+    - name: Ensure iwd is installed
+      community.general.pacman:
+        name: iwd
+
+    ################################################################################
+    # ユーザーを作る
+    ################################################################################
+    - name: Ensure sudo is installed
+      community.general.pacman:
+        name: sudo
+
+    # TODO: 本来はここで passwd neet している
+
+    - name: Ensure user neet is created
+      ansible.builtin.user:
+        name: neet
+        groups: wheel
+        append: yes
+
+    # TODO: 本来はここで visudo している
+    # https://docs.ansible.com/projects/ansible/latest/collections/community/general/sudoers_module.html
+
+    ################################################################################
+    # 開発環境のセットアップ
+    ################################################################################
+    - name: Ensure Neovim and related packages are installed
+      community.general.pacman:
+        name:
+          - neovim
+          - gcc
+          - treesitter-cli
+
+    ################################################################################
+    # Bluetooth のセットアップ
+    ################################################################################
+    - name: Ensure Bluetooth related packages are installed
+      community.general.pacman:
+        name:
+          - bluez
+          - bluez-utils
+
+    - name: Ensure bluetooth is enabled
+      ansible.builtin.service:
+        name: bluetooth
+        enalbed: true
+        state: started
+
+    ################################################################################
+    # GUI のセットアップ
+    ################################################################################
+    - name: Ensure GNOME is installed
+      community.general.pacman:
+        name: gnome
