@@ -32,16 +32,20 @@
       community.general.pacman:
         name: sudo
 
-    # TODO: 本来はここで passwd neet している
-
+    # TODO: `password` を付けて呼ぶようにする
     - name: Ensure user neet is created
       ansible.builtin.user:
         name: neet
         groups: wheel
         append: yes
 
-    # TODO: 本来はここで visudo している
-    # https://docs.ansible.com/projects/ansible/latest/collections/community/general/sudoers_module.html
+    - name: Ensure wheel group can sudo
+      community.general.sudoers:
+        name: wheel
+        group: wheel
+        runas: ALL:ALL
+        commands: ALL
+        nopassword: false
     
     # TODO: ここの手順2をやる
     # https://wiki.archlinux.jp/index.php/%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AA%E3%82%BC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3#%E3%83%AD%E3%82%B1%E3%83%BC%E3%83%AB
@@ -54,6 +58,7 @@
         name:
           - neovim
           - gcc
+          - ghq
           - direnv
           - tree-sitter-cli
 
