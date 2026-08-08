@@ -32,12 +32,13 @@
       community.general.pacman:
         name: sudo
 
-    # TODO: `password` を付けて呼ぶようにする
-    - name: Ensure user neet is created
+    - name: Ensure user is created
       ansible.builtin.user:
-        name: neet
+        name: "{{ user_name }}"
+        password: "{{ user_password }}" 
         groups: wheel
         append: yes
+        update_password: on_create
 
     - name: Ensure wheel group can sudo
       community.general.sudoers:
