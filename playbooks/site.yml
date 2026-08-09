@@ -1,18 +1,19 @@
 ---
 - name: Prepare Desktop
   hosts: localhost
-  become: true
   tasks:
     ################################################################################
     # 環境変数
     ################################################################################
     - name: Ensure environment is copied
+      become: true
       ansible.builtin.copy:
         src: environment
         dest: /etc/environment
         mode: "0644"
 
     - name: Ensure locales are enabled
+      become: true
       community.general.locale_gen:
         name:
         - "en_US.UTF-8"
@@ -21,10 +22,12 @@
     # ネットワークまわり
     ################################################################################
     - name: Ensure networkmanager is installed
+      become: true
       community.general.pacman:
         name: networkmanager
 
     - name: Ensure networkmanager is enabled
+      become: true
       ansible.builtin.service:
         name: NetworkManager 
         enabled: true
@@ -34,10 +37,12 @@
     # ユーザーを作る
     ################################################################################
     - name: Ensure sudo is installed
+      become: true
       community.general.pacman:
         name: sudo
 
     - name: Ensure user is created
+      become: true
       ansible.builtin.user:
         name: "{{ user_name }}"
         password: "{{ user_password }}" 
@@ -46,6 +51,7 @@
         update_password: on_create
 
     - name: Ensure wheel group can sudo
+      become: true
       community.general.sudoers:
         name: wheel
         group: wheel
@@ -57,6 +63,7 @@
     # 開発環境のセットアップ
     ################################################################################
     - name: Ensure Neovim and related packages are installed
+      become: true
       community.general.pacman:
         name:
           - neovim
@@ -69,12 +76,14 @@
     # Bluetooth のセットアップ
     ################################################################################
     - name: Ensure Bluetooth related packages are installed
+      become: true
       community.general.pacman:
         name:
           - bluez
           - bluez-utils
 
     - name: Ensure bluetooth is enabled
+      become: true
       ansible.builtin.service:
         name: bluetooth
         enabled: true
@@ -84,5 +93,23 @@
     # GUI のセットアップ
     ################################################################################
     - name: Ensure GNOME is installed
+      become: true
       community.general.pacman:
         name: gnome
+
+    ################################################################################
+    # AUR のインストール
+    ################################################################################
+    # - name: Clone 1Password
+    #   ansible.builtin.git:
+    #     repo: https://aur.archlinux.org/1password.git
+    #     dest: "{{ ansible_env.HOME }}/1password" 
+    #
+    # - name: Build 1Password
+    #   ansible.builtin.command:
+    #     argv: makepkg -s
+    #     creates: "{{ ansible_env.HOME }}/1password/1password-*"
+    #
+    # - name: Install 1Password
+    #   community.general.pacman:
+    #     name: "~/1password/1password-XXXXXXXXXXXX"
