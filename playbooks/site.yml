@@ -97,10 +97,14 @@
     ################################################################################
     # GUI のセットアップ
     ################################################################################
-    - name: Ensure GNOME is installed
+    - name: Ensure GNOME and related packages are installed
       become: true
       community.general.pacman:
-        name: gnome
+        name:
+        - alacritty
+        - discord
+        - firefox
+        - gnome
 
     ################################################################################
     # AUR のインストール
