@@ -67,10 +67,13 @@
       become: true
       community.general.pacman:
         name:
-          - neovim
+          - direnv
           - gcc
           - ghq
-          - direnv
+          - git
+          - lazygit
+          - less
+          - neovim
           - tree-sitter-cli
 
     ################################################################################
@@ -102,30 +105,20 @@
     ################################################################################
     # AUR のインストール
     ################################################################################
-    - name: Ensure 1Password is prepared
+    - name: Ensure 1Password is installed
+      ansible.builtin.include_tasks: aur.yml
       vars:
-        aur_dir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password" 
-      block:
-        - name: Ensure 1Password is cloned from AUR
-          ansible.builtin.git:
-            repo: https://aur.archlinux.org/1password.git
-            dest: "{{ aur_dir }}"
-            version: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+        aur_name: 1password
+        aur_version: d991324ae2605a3142318cd33fe3d7da6a9f98eb
 
-        - name: Ensure 1Password package is registered to a variable
-          register: packagelist
-          ansible.builtin.command:
-            chdir: "{{ aur_dir }}"
-            cmd: "makepkg --packagelist"
-          changed_when: false
+    - name: Ensure ibus-mozc is installed
+      ansible.builtin.include_tasks: aur.yml
+      vars:
+        aur_name: ibus-mozc
+        aur_version: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
 
-        - name: Ensure 1Password is built
-          ansible.builtin.command:
-            chdir: "{{ aur_dir }}"
-            cmd: "makepkg -s"
-            creates: "{{ packagelist.stdout }}"
-
-        - name: Ensure 1Password is installed
-          become: true
-          community.general.pacman:
-            name: "{{ packagelist.stdout }}"
+    - name: Ensure mozc is installed
+      ansible.builtin.include_tasks: aur.yml
+      vars:
+        aur_name: mozc
+        aur_version: 53a13d01af98e3e08f35c49b441cc0fafdaea86f

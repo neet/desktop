@@ -1,0 +1,29 @@
+- name: Install AUR package
+  vars:
+    aur_base: "{{ ansible_facts['user_dir'] }}/.cache/aur"
+    aur_workdir: "{{ aur_base }}/{{ aur_name }}" 
+  block:
+    - name: "Ensure {{ aur_name }} is cloned from AUR"
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/{{ aur_name }}.git
+        dest: "{{ aur_workdir }}"
+        version: "{{ aur_version }}"
+
+    - name: "Ensure {{ aur_name }} is registered to a variable"
+      register: packagelist
+      ansible.builtin.command:
+        chdir: "{{ aur_workdir }}"
+        cmd: "makepkg --packagelist"
+      changed_when: false
+      check_mode: false
+
+    - name: "Ensure {{ aur_name }} is built"
+      ansible.builtin.command:
+        chdir: "{{ aur_workdir }}"
+        cmd: "makepkg -s"
+        creates: "{{ packagelist.stdout_lines[0] }}"
+
+    - name: "Ensure {{ aur_name }} is installed"
+      become: true
+      community.general.pacman:
+        name: "{{ packagelist.stdout_lines }}"
