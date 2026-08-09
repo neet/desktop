@@ -21,43 +21,44 @@
     ################################################################################
     # ネットワークまわり
     ################################################################################
-    - name: Ensure networkmanager is installed
+    - name: Ensure networkmanager is prepared
       become: true
-      community.general.pacman:
-        name: networkmanager
+      block:
+        - name: Ensure networkmanager is installed
+          community.general.pacman:
+            name: networkmanager
 
-    - name: Ensure networkmanager is enabled
-      become: true
-      ansible.builtin.service:
-        name: NetworkManager 
-        enabled: true
-        state: started
+        - name: Ensure networkmanager is enabled
+          ansible.builtin.service:
+            name: NetworkManager 
+            enabled: true
+            state: started
 
     ################################################################################
     # ユーザーを作る
     ################################################################################
-    - name: Ensure sudo is installed
+    - name: Ensure user is prepared
       become: true
-      community.general.pacman:
-        name: sudo
+      block:
+        - name: Ensure sudo is installed
+          community.general.pacman:
+            name: sudo
 
-    - name: Ensure user is created
-      become: true
-      ansible.builtin.user:
-        name: "{{ user_name }}"
-        password: "{{ user_password }}" 
-        groups: wheel
-        append: yes
-        update_password: on_create
+        - name: Ensure user is created
+          ansible.builtin.user:
+            name: "{{ user_name }}"
+            password: "{{ user_password }}" 
+            groups: wheel
+            append: yes
+            update_password: on_create
 
-    - name: Ensure wheel group can sudo
-      become: true
-      community.general.sudoers:
-        name: wheel
-        group: wheel
-        runas: ALL:ALL
-        commands: ALL
-        nopassword: false
+        - name: Ensure wheel group can sudo
+          community.general.sudoers:
+            name: wheel
+            group: wheel
+            runas: ALL:ALL
+            commands: ALL
+            nopassword: false
     
     ################################################################################
     # 開発環境のセットアップ
@@ -75,19 +76,20 @@
     ################################################################################
     # Bluetooth のセットアップ
     ################################################################################
-    - name: Ensure Bluetooth related packages are installed
+    - name: Ensure Bluetooth is prepared
       become: true
-      community.general.pacman:
-        name:
-          - bluez
-          - bluez-utils
+      block:
+        - name: Ensure Bluetooth related packages are installed
+          community.general.pacman:
+            name:
+              - bluez
+              - bluez-utils
 
-    - name: Ensure bluetooth is enabled
-      become: true
-      ansible.builtin.service:
-        name: bluetooth
-        enabled: true
-        state: started
+        - name: Ensure bluetooth is enabled
+          ansible.builtin.service:
+            name: bluetooth
+            enabled: true
+            state: started
 
     ################################################################################
     # GUI のセットアップ
@@ -100,26 +102,30 @@
     ################################################################################
     # AUR のインストール
     ################################################################################
-    - name: Ensure 1Password is cloned from AUR
-      ansible.builtin.git:
-        repo: https://aur.archlinux.org/1password.git
-        dest: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password" 
-        version: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+    - name: Ensure 1Password is prepared
+      vars:
+        aur_dir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password" 
+      block:
+        - name: Ensure 1Password is cloned from AUR
+          ansible.builtin.git:
+            repo: https://aur.archlinux.org/1password.git
+            dest: "{{ aur_dir }}"
+            version: d991324ae2605a3142318cd33fe3d7da6a9f98eb
 
-    - name: Ensure 1Password package is registered to a variable
-      register: packagelist
-      ansible.builtin.command:
-        chdir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password"
-        cmd: "makepkg --packagelist"
-      changed_when: false
+        - name: Ensure 1Password package is registered to a variable
+          register: packagelist
+          ansible.builtin.command:
+            chdir: "{{ aur_dir }}"
+            cmd: "makepkg --packagelist"
+          changed_when: false
 
-    - name: Ensure 1Password is built
-      ansible.builtin.command:
-        chdir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password"
-        cmd: "makepkg -s"
-        creates: "{{ packagelist.stdout }}"
+        - name: Ensure 1Password is built
+          ansible.builtin.command:
+            chdir: "{{ aur_dir }}"
+            cmd: "makepkg -s"
+            creates: "{{ packagelist.stdout }}"
 
-    - name: Ensure 1Password is installed
-      become: true
-      community.general.pacman:
-        name: "{{ packagelist.stdout }}"
+        - name: Ensure 1Password is installed
+          become: true
+          community.general.pacman:
+            name: "{{ packagelist.stdout }}"
