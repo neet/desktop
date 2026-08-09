@@ -105,6 +105,7 @@
         - discord
         - firefox
         - gnome
+        - anki
 
     ################################################################################
     # AUR のインストール
@@ -126,3 +127,9 @@
       vars:
         aur_name: mozc
         aur_version: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
+
+    - name: Ensure Slack is installed
+      ansible.builtin.include_tasks: aur.yml
+      vars:
+        aur_name: slack-desktop
+        aur_version: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
