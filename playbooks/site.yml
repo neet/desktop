@@ -100,16 +100,26 @@
     ################################################################################
     # AUR のインストール
     ################################################################################
-    # - name: Clone 1Password
-    #   ansible.builtin.git:
-    #     repo: https://aur.archlinux.org/1password.git
-    #     dest: "{{ ansible_env.HOME }}/1password" 
-    #
-    # - name: Build 1Password
-    #   ansible.builtin.command:
-    #     argv: makepkg -s
-    #     creates: "{{ ansible_env.HOME }}/1password/1password-*"
-    #
-    # - name: Install 1Password
-    #   community.general.pacman:
-    #     name: "~/1password/1password-XXXXXXXXXXXX"
+    - name: Ensure 1Password is cloned from AUR
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/1password.git
+        dest: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password" 
+        version: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+
+    - name: Ensure 1Password package is registered to a variable
+      register: packagelist
+      ansible.builtin.command:
+        chdir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password"
+        cmd: "makepkg --packagelist"
+      changed_when: false
+
+    - name: Ensure 1Password is built
+      ansible.builtin.command:
+        chdir: "{{ ansible_facts['user_dir'] }}/.cache/aur/1password"
+        cmd: "makepkg -s"
+        creates: "{{ packagelist.stdout }}"
+
+    - name: Ensure 1Password is installed
+      become: true
+      community.general.pacman:
+        name: "{{ packagelist.stdout }}"
