@@ -1,0 +1,13 @@
+modmap:
+  - name: macOS-like IME switch
+    remap:
+      Super_L:
+        held: Super_L
+        alone: Muhenkan
+        alone_timeout_millis: 300
+        free_hold: true
+      Super_R:
+        held: Super_R
+        alone: Henkan
+        alone_timeout_millis: 300
+        free_hold: true

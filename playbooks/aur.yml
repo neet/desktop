@@ -13,6 +13,7 @@
       register: packagelist
       ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
+        # TODO: pure が debug を出力するんだけど生成はされていない。上流のミス？
         cmd: "makepkg --packagelist | awk '! /-debug-/'"
       changed_when: false
       check_mode: false

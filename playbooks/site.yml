@@ -1,6 +1,13 @@
 ---
 - name: Prepare Desktop
   hosts: localhost
+  handlers:
+    - name: Restart Xremap
+      ansible.builtin.service:
+        name: xremap 
+        scope: user
+        state: restarted
+        daemon_reload: true
   tasks:
     ################################################################################
     # 環境変数
@@ -48,7 +55,9 @@
           ansible.builtin.user:
             name: "{{ user_name }}"
             password: "{{ user_password }}" 
-            groups: wheel
+            groups:
+              - wheel
+              - input
             append: yes
             update_password: on_create
 
@@ -128,3 +137,41 @@
         mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
         slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
         zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
+
+    ################################################################################
+    # Xremap のインストール
+    ################################################################################
+    - name: Ensure Xremap is prepared
+      notify: Restart Xremap
+      block:
+        - name: Ensure Xremap is installed
+          community.general.cargo:
+            name: xremap
+            version: 0.10.7
+            features: [gnome]
+
+        - name: Ensure Xremap config is copied
+          ansible.builtin.copy:
+            src: xremap.yaml
+            dest: "{{ ansible_facts['user_dir'] }}/.config/xremap.yaml"
+            mode: "0644"
+
+        - name: Ensure input group can create output devices
+          become: true
+          ansible.builtin.copy:
+            src: 99-input.rules
+            dest: /etc/udev/rules.d/99-input.rules
+            mode: "0644"
+
+        - name: Ensure Xremap service exists
+          ansible.builtin.copy:
+            src: xremap.service
+            dest: "{{ ansible_facts['user_dir'] }}/.config/systemd/user/xremap.service"
+            mode: "0644"
+
+        - name: Ensure Xremap is enabled
+          ansible.builtin.service:
+            name: xremap 
+            scope: user
+            enabled: true
+            state: started
