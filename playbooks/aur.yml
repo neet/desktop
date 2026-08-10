@@ -11,14 +11,14 @@
 
     - name: "Ensure {{ aur_name }} is registered to a variable"
       register: packagelist
-      ansible.builtin.command:
+      ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
-        cmd: "makepkg --packagelist"
+        cmd: "makepkg --packagelist | awk '! /-debug-/'"
       changed_when: false
       check_mode: false
 
     - name: "Ensure {{ aur_name }} is built"
-      ansible.builtin.command:
+      ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
         cmd: "makepkg -s"
         creates: "{{ packagelist.stdout_lines[0] }}"
