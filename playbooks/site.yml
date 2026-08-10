@@ -84,11 +84,15 @@
           - jq
           - lazygit
           - less
+          - lua-language-server
           - neovim
+          - nodejs
+          - npm
           - ripgrep
           - rust
           - tmux
           - tree-sitter-cli
+          - typescript-language-server
           - zsh-autosuggestions
           - zsh-syntax-highlighting
 
@@ -137,6 +141,7 @@
         mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
         slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
         zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
+        vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
 
     ################################################################################
     # Xremap のインストール
