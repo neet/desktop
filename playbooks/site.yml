@@ -1,13 +1,22 @@
 ---
 - name: Prepare Desktop
   hosts: localhost
+
   handlers:
     - name: Restart Xremap
+      become: true
       ansible.builtin.service:
         name: xremap 
         scope: user
         state: restarted
         daemon_reload: true
+
+    - name: Restart logid
+      become: true
+      ansible.builtin.service:
+        name: logid 
+        state: restarted
+
   tasks:
     ################################################################################
     # 環境変数
@@ -130,18 +139,49 @@
     ################################################################################
     # AUR のインストール
     ################################################################################
-    - name: Ensure AUR packages are installed
-      ansible.builtin.include_tasks: aur.yml
-      vars:
-        aur_name: "{{ item.key }}"
-        aur_version: "{{ item.value }}"
-      with_dict:
-        1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
-        ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
-        mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
-        slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
-        zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
-        vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
+    - name: Ensure AUR packages are prepared
+      block:
+        # makepkg に become 付けたら怒られるのでどうすればいいのやら。
+        - name: Ensure AUR dependencies are explicitly installed
+          become: true
+          community.general.pacman:
+            name:
+              # logiops の依存
+              - cmake
+              - libconfig
+
+        - name: Ensure AUR packages are installed
+          ansible.builtin.include_tasks: aur.yml
+          vars:
+            aur_name: "{{ item.key }}"
+            aur_version: "{{ item.value }}"
+          with_dict:
+            1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+            ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
+            logiops: 1458d302ec8b529cfb1dbc5937f284f3a95240ce
+            mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
+            slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
+            vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
+            zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
+
+    ################################################################################
+    # Logiops のインストール
+    ################################################################################
+    - name: Ensure Logiops is prepared
+      notify: Restart logid
+      become: true
+      block:
+        - name: Ensure logid is enabled
+          ansible.builtin.service:
+            name: logid
+            enabled: true
+            state: started
+
+        - name: Ensure logid config is copied
+          ansible.builtin.copy:
+            src: logid.cfg
+            dest: /etc/logid.cfg
+            mode: "0644"
 
     ################################################################################
     # Xremap のインストール
