@@ -8,6 +8,7 @@
         repo: https://aur.archlinux.org/{{ aur_name }}.git
         dest: "{{ aur_workdir }}"
         version: "{{ aur_version }}"
+        update: "{{ aur_update }}"
 
     - name: "Ensure {{ aur_name }} is registered to a variable"
       register: packagelist

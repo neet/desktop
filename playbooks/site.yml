@@ -155,6 +155,7 @@
           vars:
             aur_name: "{{ item.key }}"
             aur_version: "{{ item.value }}"
+            aur_update: false
           with_dict:
             1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
             ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
