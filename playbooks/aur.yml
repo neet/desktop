@@ -21,7 +21,7 @@
     - name: "Ensure {{ aur_name }} is built"
       ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
-        cmd: "makepkg -s"
+        cmd: "makepkg"
         creates: "{{ packagelist.stdout_lines[0] }}"
 
     - name: "Ensure {{ aur_name }} is installed"
