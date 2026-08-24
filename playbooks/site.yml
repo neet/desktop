@@ -126,15 +126,24 @@
     ################################################################################
     # GUI のセットアップ
     ################################################################################
-    - name: Ensure GNOME and related packages are installed
-      become: true
-      community.general.pacman:
-        name:
-        - alacritty
-        - discord
-        - firefox
-        - gnome
-        - anki
+    - name: Ensure GNOME packages are prepared
+      block:
+        - name: Ensure GNOME and related packages are installed
+          become: true
+          community.general.pacman:
+            name:
+            - gnome
+            - gnome-tweaks
+            - gnome-browser-connector
+
+        - name: Ensure GUI apps are installed
+          become: true
+          community.general.pacman:
+            name:
+            - alacritty
+            - anki
+            - discord
+            - firefox
 
     ################################################################################
     # AUR のインストール
