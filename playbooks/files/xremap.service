@@ -1,11 +1,12 @@
 [Unit]
 Description=xremap
-After=graphical-session.target
+After=default.target
 
 [Service]
 ExecStart=%h/.cargo/bin/xremap %h/.config/xremap.yaml
-Restart=on-failure
-RestartSec=3
+StandardOutput=journal
+StandardError=journal
+Restart=always
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=default.target

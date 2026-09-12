@@ -4,7 +4,6 @@
 
   handlers:
     - name: Restart Xremap
-      become: true
       ansible.builtin.service:
         name: xremap 
         scope: user
@@ -194,6 +193,7 @@
 
     ################################################################################
     # Xremap のインストール
+    # https://github.com/xremap/xremap/blob/master/doc/running_without_sudo.md
     ################################################################################
     - name: Ensure Xremap is prepared
       notify: Restart Xremap
