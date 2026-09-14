@@ -5,7 +5,7 @@
   handlers:
     - name: Restart Xremap
       ansible.builtin.service:
-        name: xremap 
+        name: xremap
         scope: user
         state: restarted
         daemon_reload: true
@@ -13,18 +13,19 @@
     - name: Restart logid
       become: true
       ansible.builtin.service:
-        name: logid 
+        name: logid
         state: restarted
 
     - name: Restart bluetooth
       become: true
       ansible.builtin.service:
-        name: bluetooth 
+        name: bluetooth
         state: restarted
 
     - name: Run fc-cache
       become: true
-      ansible.builtin.shell:
+      changed_when: false
+      ansible.builtin.command:
         cmd: "fc-cache -fv"
 
     - name: Restart avahi
@@ -48,7 +49,7 @@
       become: true
       community.general.locale_gen:
         name:
-        - "en_US.UTF-8"
+          - "en_US.UTF-8"
 
     ################################################################################
     # ネットワークまわり
@@ -62,7 +63,7 @@
 
         - name: Ensure networkmanager is enabled
           ansible.builtin.service:
-            name: NetworkManager 
+            name: NetworkManager
             enabled: true
             state: started
 
@@ -73,8 +74,8 @@
         - name: Ensure avahi and nss-mdns is installed
           community.general.pacman:
             name:
-            - avahi
-            - nss-mdns
+              - avahi
+              - nss-mdns
 
         - name: Ensure mDNS is set to nsswitch
           ansible.builtin.lineinfile:
@@ -84,7 +85,7 @@
 
         - name: Ensure avahi-daemon is enabled
           ansible.builtin.service:
-            name: avahi-daemon 
+            name: avahi-daemon
             enabled: true
             state: started
 
@@ -101,11 +102,11 @@
         - name: Ensure user is created
           ansible.builtin.user:
             name: "{{ user_name }}"
-            password: "{{ user_password }}" 
+            password: "{{ user_password }}"
             groups:
               - wheel
               - input
-            append: yes
+            append: true
             update_password: on_create
 
         - name: Ensure wheel group can sudo
@@ -121,7 +122,7 @@
             path: "{{ ansible_facts['user_dir'] }}/.ssh/id_ed25519"
             type: ed25519
             backend: opensshbin
-      
+
     ################################################################################
     # 開発環境のセットアップ
     ################################################################################
@@ -162,15 +163,14 @@
       vars:
         dotfiles_dir: "{{ ansible_facts['user_dir'] }}/dotfiles"
       block:
-        - name: Ensure dotfiles is cloned
-          register: dotfiles
+        - name: Ensure dotfiles is cloned # noqa latest
           ansible.builtin.git:
             repo: https://github.com/neet/dotfiles
             dest: "{{ dotfiles_dir }}"
 
         - name: Ensure setup ran
-          when: dotfiles is changed
-          ansible.builtin.shell:
+          changed_when: false
+          ansible.builtin.command:
             chdir: "{{ dotfiles_dir }}"
             cmd: "./setup.sh"
 
@@ -203,35 +203,35 @@
           community.general.pacman:
             name:
             # GNOME グループに入っているやつ
-            - gdm
-            - gnome-color-manager
-            - gnome-control-center
-            - gnome-font-viewer
-            - gnome-keyring
-            - gnome-logs
-            - gnome-menus
-            - gnome-remote-desktop
-            - gnome-session
-            - gnome-settings-daemon
-            - gnome-shell
-            - gnome-system-monitor
-            - gnome-user-docs
-            - gst-thumbnailers
-            - gvfs
-            - gvfs-dnssd
-            - gvfs-smb
-            - gvfs-wsdd
-            - loupe
-            - nautilus
-            - orca
-            - showtime
-            - sushi
-            - xdg-desktop-portal-gnome
-            - xdg-user-dirs-gtk
-            - yelp
-            # showtime で H.264 を再生するのに必要
-            - gst-libav
-        
+              - gdm
+              - gnome-color-manager
+              - gnome-control-center
+              - gnome-font-viewer
+              - gnome-keyring
+              - gnome-logs
+              - gnome-menus
+              - gnome-remote-desktop
+              - gnome-session
+              - gnome-settings-daemon
+              - gnome-shell
+              - gnome-system-monitor
+              - gnome-user-docs
+              - gst-thumbnailers
+              - gvfs
+              - gvfs-dnssd
+              - gvfs-smb
+              - gvfs-wsdd
+              - loupe
+              - nautilus
+              - orca
+              - showtime
+              - sushi
+              - xdg-desktop-portal-gnome
+              - xdg-user-dirs-gtk
+              - yelp
+              # showtime で H.264 を再生するのに必要
+              - gst-libav
+
         - name: Ensure gdm is enabled
           ansible.builtin.service:
             name: gdm
@@ -242,22 +242,22 @@
           become: true
           community.general.pacman:
             name:
-            - gnome-tweaks
-            - gnome-browser-connector
-            # Neovim から Wayland のクリップボードにアクセスするために必要
-            # https://neovim.io/doc/user/provider/#provider-clipboard
-            - wl-clipboard
+              - gnome-tweaks
+              - gnome-browser-connector
+              # Neovim から Wayland のクリップボードにアクセスするために必要
+              # https://neovim.io/doc/user/provider/#provider-clipboard
+              - wl-clipboard
 
         - name: Ensure GUI apps are installed
           become: true
           community.general.pacman:
             name:
-            - alacritty
-            - anki
-            - discord
-            - firefox
-            - noto-fonts-cjk
-            - ttf-jetbrains-mono-nerd
+              - alacritty
+              - anki
+              - discord
+              - firefox
+              - noto-fonts-cjk
+              - ttf-jetbrains-mono-nerd
 
         - name: Ensure fontconfig is set
           become: true
@@ -282,17 +282,17 @@
               - libconfig
 
         - name: Ensure AUR packages are installed
-          ansible.builtin.include_tasks: aur.yml
+          ansible.builtin.include_tasks: tasks/aur.yml
           vars:
             aur_name: "{{ item.key }}"
             aur_version: "{{ item.value }}"
           with_dict:
             1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
             claude-code: c228df23638624076be486c55c697b06e6d1d1d7
-            ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
+            ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc
             logiops: 1458d302ec8b529cfb1dbc5937f284f3a95240ce
             mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
-            slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6 
+            slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6
             vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
             zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
 
@@ -349,7 +349,7 @@
 
         - name: Ensure Xremap is enabled
           ansible.builtin.service:
-            name: xremap 
+            name: xremap
             scope: user
             enabled: true
             state: started

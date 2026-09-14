@@ -1,3 +1,4 @@
+---
 modmap:
   - name: macOS-like IME switch
     remap:

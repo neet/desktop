@@ -1,30 +1,33 @@
-- name: Install AUR package
+---
+- name: "Install AUR package: {{ aur_name }}"
   vars:
     aur_base: "{{ ansible_facts['user_dir'] }}/.cache/aur"
-    aur_workdir: "{{ aur_base }}/{{ aur_name }}" 
+    aur_workdir: "{{ aur_base }}/{{ aur_name }}"
   block:
-    - name: "Ensure {{ aur_name }} is cloned from AUR"
+    - name: "Ensure AUR is cloned"
       ansible.builtin.git:
         repo: https://aur.archlinux.org/{{ aur_name }}.git
         dest: "{{ aur_workdir }}"
         version: "{{ aur_version }}"
 
-    - name: "Ensure {{ aur_name }} is registered to a variable"
+    - name: "Ensure AUR is registered to a variable"
       register: packagelist
       ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
         # TODO: pure が debug を出力するんだけど生成はされていない。上流のミス？
-        cmd: "makepkg --packagelist | awk '! /-debug-/'"
+        cmd: |
+          set -o pipefail
+          makepkg --packagelist | awk '! /-debug-/'
       changed_when: false
       check_mode: false
 
-    - name: "Ensure {{ aur_name }} is built"
-      ansible.builtin.shell:
+    - name: "Ensure AUR is built"
+      ansible.builtin.command:
         chdir: "{{ aur_workdir }}"
         cmd: "makepkg"
         creates: "{{ packagelist.stdout_lines[0] }}"
 
-    - name: "Ensure {{ aur_name }} is installed"
+    - name: "Ensure AUR is installed"
       become: true
       community.general.pacman:
         name: "{{ packagelist.stdout_lines }}"
