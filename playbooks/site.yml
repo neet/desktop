@@ -102,6 +102,7 @@
           - ghq
           - git
           - github-cli
+          - glow
           - jq
           - lazygit
           - less
