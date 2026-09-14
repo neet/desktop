@@ -195,6 +195,12 @@
             - yelp
             # showtime で H.264 を再生するのに必要
             - gst-libav
+        
+        - name: Ensure gdm is enabled
+          ansible.builtin.service:
+            name: gdm
+            enabled: true
+            state: started
 
         - name: Ensure GNOME related packages are installed
           become: true
