@@ -162,12 +162,14 @@
       vars:
         dotfiles_dir: "{{ ansible_facts['user_dir'] }}/dotfiles"
       block:
-        - name: Install dotfiles
+        - name: Ensure dotfiles is cloned
+          register: dotfiles
           ansible.builtin.git:
             repo: https://github.com/neet/dotfiles
             dest: "{{ dotfiles_dir }}"
 
-        - name: Run setup
+        - name: Ensure setup ran
+          when: dotfiles is changed
           ansible.builtin.shell:
             chdir: "{{ dotfiles_dir }}"
             cmd: "./setup.sh"
