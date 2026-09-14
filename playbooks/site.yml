@@ -22,6 +22,11 @@
         name: bluetooth 
         state: restarted
 
+    - name: Run fc-cache
+      become: true
+      ansible.builtin.shell:
+        cmd: "fc-cache -fv"
+
   tasks:
     ################################################################################
     # 環境変数
@@ -156,11 +161,11 @@
     ################################################################################
     - name: Ensure GNOME packages are prepared
       block:
-        - name: Ensure GNOME and related packages are installed
+        # GNOME グループに入っているやつ
+        - name: Ensure GNOME is installed
           become: true
           community.general.pacman:
             name:
-            # GNOME グループに入っているやつ
             - baobab
             - decibels
             - epiphany
@@ -219,9 +224,16 @@
             - xdg-desktop-portal-gnome
             - xdg-user-dirs-gtk
             - yelp
-            # 追加パッケージ
+
+        - name: Ensure GNOME related packages are installed
+          become: true
+          community.general.pacman:
+            name:
             - gnome-tweaks
             - gnome-browser-connector
+            # Neovim から Wayland のクリップボードにアクセスするために必要
+            # https://neovim.io/doc/user/provider/#provider-clipboard
+            - wl-clipboard
 
         - name: Ensure GUI apps are installed
           become: true
@@ -233,6 +245,14 @@
             - firefox
             - noto-fonts-cjk
             - ttf-jetbrains-mono-nerd
+
+        - name: Ensure fontconfig is set
+          become: true
+          notify: Run fc-cache
+          ansible.builtin.copy:
+            src: font.conf
+            dest: /etc/fonts/local.conf
+            mode: "0644"
 
     ################################################################################
     # AUR のインストール
