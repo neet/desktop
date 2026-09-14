@@ -91,10 +91,12 @@
       community.general.pacman:
         name:
           - direnv
+          - fastfetch
           - fzf
           - gcc
           - ghq
           - git
+          - github-cli
           - jq
           - lazygit
           - less
@@ -107,7 +109,9 @@
           - tmux
           - tree-sitter-cli
           - typescript-language-server
+          - zsh
           - zsh-autosuggestions
+          - zsh-completions
           - zsh-syntax-highlighting
 
     ################################################################################
@@ -227,6 +231,8 @@
             - anki
             - discord
             - firefox
+            - noto-fonts-cjk
+            - ttf-jetbrains-mono-nerd
 
     ################################################################################
     # AUR のインストール
