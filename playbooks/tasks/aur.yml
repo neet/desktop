@@ -14,7 +14,7 @@
       register: packagelist
       ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
-        # TODO: pure が debug を出力するんだけど生成はされていない。上流のミス？
+        # TODO: vscode-langservers-extracted が debug を出力するんだけど生成はされていない。上流のミス？
         cmd: |
           set -o pipefail
           makepkg --packagelist | awk '! /-debug-/'
