@@ -111,6 +111,24 @@
           - zsh-syntax-highlighting
 
     ################################################################################
+    # dotfiles のセットアップ
+    ################################################################################
+    - name: Ensure dotfiles is up
+      become: true
+      vars:
+        dotfiles_dir: "{{ ansible_facts['user_dir'] }}/dotfiles"
+      block:
+        - name: Install dotfiles
+          ansible.builtin.git:
+            repo: https://github.com/neet/dotfiles
+            dest: "{{ dotfiles_dir }}"
+
+        - name: Run setup
+          ansible.builtin.shell:
+            chdir: "{{ dotfiles_dir }}"
+            cmd: "./setup.sh"
+
+    ################################################################################
     # Bluetooth のセットアップ
     ################################################################################
     - name: Ensure Bluetooth is prepared
