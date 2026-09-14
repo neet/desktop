@@ -229,8 +229,6 @@
               - xdg-desktop-portal-gnome
               - xdg-user-dirs-gtk
               - yelp
-              # showtime で H.264 を再生するのに必要
-              - gst-libav
 
         - name: Ensure gdm is enabled
           ansible.builtin.service:
@@ -242,11 +240,15 @@
           become: true
           community.general.pacman:
             name:
-              - gnome-tweaks
+              # Firefox から GNOME extension を入れる
               - gnome-browser-connector
               # Neovim から Wayland のクリップボードにアクセスするために必要
               # https://neovim.io/doc/user/provider/#provider-clipboard
               - wl-clipboard
+              # showtime で H.264 を再生するのに必要
+              - gst-libav
+              # dconf (gsettings の低レベル API)
+              - dconf-editor
 
         - name: Ensure GUI apps are installed
           become: true
