@@ -16,6 +16,12 @@
         name: logid 
         state: restarted
 
+    - name: Restart bluetooth
+      become: true
+      ansible.builtin.service:
+        name: bluetooth 
+        state: restarted
+
   tasks:
     ################################################################################
     # 環境変数
@@ -109,6 +115,7 @@
     ################################################################################
     - name: Ensure Bluetooth is prepared
       become: true
+      notify: Restart bluetooth
       block:
         - name: Ensure Bluetooth related packages are installed
           community.general.pacman:
@@ -165,6 +172,7 @@
             aur_version: "{{ item.value }}"
           with_dict:
             1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+            claude-code: c228df23638624076be486c55c697b06e6d1d1d7
             ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc 
             logiops: 1458d302ec8b529cfb1dbc5937f284f3a95240ce
             mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
