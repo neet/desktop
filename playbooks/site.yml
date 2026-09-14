@@ -27,6 +27,12 @@
       ansible.builtin.shell:
         cmd: "fc-cache -fv"
 
+    - name: Restart avahi
+      become: true
+      ansible.builtin.service:
+        name: avahi-daemon
+        state: restarted
+
   tasks:
     ################################################################################
     # 環境変数
@@ -60,6 +66,28 @@
             enabled: true
             state: started
 
+    - name: Ensure mDNS is ready
+      become: true
+      notify: Restart avahi
+      block:
+        - name: Ensure avahi and nss-mdns is installed
+          community.general.pacman:
+            name:
+            - avahi
+            - nss-mdns
+
+        - name: Ensure mDNS is set to nsswitch
+          ansible.builtin.lineinfile:
+            path: /etc/nsswitch.conf
+            regexp: "^hosts:"
+            line: "hosts: mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns"
+
+        - name: Ensure avahi-daemon is enabled
+          ansible.builtin.service:
+            name: avahi-daemon 
+            enabled: true
+            state: started
+
     ################################################################################
     # ユーザーを作る
     ################################################################################
@@ -87,7 +115,13 @@
             runas: ALL:ALL
             commands: ALL
             nopassword: false
-    
+
+        - name: Ensure openssh key is generated
+          community.crypto.openssh_keypair:
+            path: "{{ ansible_facts['user_dir'] }}/.ssh/id_ed25519"
+            type: ed25519
+            backend: opensshbin
+      
     ################################################################################
     # 開発環境のセットアップ
     ################################################################################
