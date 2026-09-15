@@ -274,14 +274,11 @@
     ################################################################################
     - name: Ensure AUR packages are prepared
       block:
-        # makepkg に become 付けたら怒られるのでどうすればいいのやら。
-        - name: Ensure AUR dependencies are explicitly installed
-          become: true
-          community.general.pacman:
-            name:
-              # logiops の依存
-              - cmake
-              - libconfig
+        - name: Ensure alpm-srcinfo is installed
+          community.general.cargo:
+            name: alpm-srcinfo
+            version: 0.6.3
+            features: [cli]
 
         - name: Ensure AUR packages are installed
           ansible.builtin.include_tasks: tasks/aur.yml

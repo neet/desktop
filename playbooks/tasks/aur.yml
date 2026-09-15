@@ -10,7 +10,27 @@
         dest: "{{ aur_workdir }}"
         version: "{{ aur_version }}"
 
-    - name: "Ensure AUR is registered to a variable"
+    # makepkg -s はインタラクティブに sudo パスワードを訊いてくるので Ansible と相性が悪い。
+    # 代わりに SRCINFO を読んで、そこから手動で依存関係を引き抜いてきている。
+    # 非常に面倒くさいので、可能ならやめたい。
+    - name: "Ensure dependencies are registered to a variable"
+      register: dependencies
+      ansible.builtin.shell:
+        chdir: "{{ aur_workdir }}"
+        cmd: |
+          set -o pipefail
+          alpm-srcinfo format -o json .SRCINFO | \
+          jq -r '.base | (.dependencies, .make_dependencies, .check_dependencies) | .[].name | select(. != null)'
+      changed_when: false
+      check_mode: false
+
+    - name: "Ensure dependencies are installed"
+      become: true
+      community.general.pacman:
+        name: "{{ dependencies.stdout_lines }}"
+        reason: dependency
+
+    - name: "Ensure packagelist is registered to a variable"
       register: packagelist
       ansible.builtin.shell:
         chdir: "{{ aur_workdir }}"
