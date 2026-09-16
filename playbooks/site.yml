@@ -292,7 +292,7 @@
             1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
             claude-code: c228df23638624076be486c55c697b06e6d1d1d7
             ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc
-            logiops: 1458d302ec8b529cfb1dbc5937f284f3a95240ce
+            # logiops-git: ec750db7bebb4a3df582476af4a292f39468d142
             mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
             slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6
             vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
@@ -303,6 +303,7 @@
     ################################################################################
     - name: Ensure Logiops is prepared
       notify: Restart logid
+      tags: ["logid"]
       become: true
       block:
         - name: Ensure logid is enabled
