@@ -103,11 +103,12 @@
           ansible.builtin.user:
             name: "{{ user_name }}"
             password: "{{ user_password }}"
+            update_password: on_create
+            shell: /usr/bin/zsh
             groups:
               - wheel
               - input
             append: true
-            update_password: on_create
 
         - name: Ensure wheel group can sudo
           community.general.sudoers:
@@ -202,7 +203,7 @@
           become: true
           community.general.pacman:
             name:
-            # GNOME グループに入っているやつ
+              # GNOME グループに入っているやつ
               - gdm
               - gnome-color-manager
               - gnome-control-center
