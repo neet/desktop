@@ -10,12 +10,6 @@
         state: restarted
         daemon_reload: true
 
-    - name: Restart logid
-      become: true
-      ansible.builtin.service:
-        name: logid
-        state: restarted
-
     - name: Restart bluetooth
       become: true
       ansible.builtin.service:
