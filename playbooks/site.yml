@@ -299,26 +299,6 @@
             google-chrome-canary: 7e18a1a01e4d2bbc023242013224b39f7908bf2b
 
     ################################################################################
-    # Remap (自作キーボードのやつ) の権限
-    # https://zenn.dev/miroscular/scraps/6941a9300c8861
-    #################################################################################
-    - name: Chmod for Remap
-      block:
-        - name: Ensure hidraw devices are registered to hidraw
-          register: hidraw
-          ansible.builtin.find:
-            paths: "/dev"
-            file_type: any
-            patterns: "hidraw*"
-
-        - name: Ensure RW is allowed from any users
-          become: true
-          ansible.builtin.file:
-            path: "{{ item.path }}"
-            mode: "0666"
-          loop: "{{ hidraw.files }}"
-
-    ################################################################################
     # Xremap のインストール
     # https://github.com/xremap/xremap/blob/master/doc/running_without_sudo.md
     ################################################################################
