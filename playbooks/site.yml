@@ -210,6 +210,7 @@
               - gnome-settings-daemon
               - gnome-shell
               - gnome-system-monitor
+              - gnome-tweaks
               - gnome-user-docs
               - gst-thumbnailers
               - gvfs
@@ -265,6 +266,17 @@
             dest: /etc/fonts/local.conf
             mode: "0644"
 
+        # https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/using_the_gnome_desktop_environment/configuring-applications-to-start-automatically-on-login
+        - name: Ensure startup applications are registered
+          become: false
+          ansible.builtin.copy:
+            src: "/usr/share/applications/{{ item }}.desktop"
+            dest: "{{ ansible_facts['user_dir'] }}/.config/autostart"
+            mode: "0644"
+          loop:
+            - 1password
+            - solaar
+
     ################################################################################
     # AUR のインストール
     ################################################################################
@@ -290,7 +302,7 @@
     # Remap (自作キーボードのやつ) の権限
     # https://zenn.dev/miroscular/scraps/6941a9300c8861
     #################################################################################
-    - name: chmod for Remap
+    - name: Chmod for Remap
       block:
         - name: Ensure hidraw devices are registered to hidraw
           register: hidraw
