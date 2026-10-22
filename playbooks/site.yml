@@ -140,6 +140,7 @@
           - neovim
           - nodejs
           - npm
+          - podman
           - ripgrep
           - rust
           - tmux
