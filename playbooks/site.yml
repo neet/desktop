@@ -239,9 +239,6 @@
             name:
               # Firefox から GNOME extension を入れる
               - gnome-browser-connector
-              # Neovim から Wayland のクリップボードにアクセスするために必要
-              # https://neovim.io/doc/user/provider/#provider-clipboard
-              - wl-clipboard
               # showtime で H.264 を再生するのに必要
               - gst-libav
               # dconf (gsettings の低レベル API)
