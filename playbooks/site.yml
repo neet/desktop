@@ -250,15 +250,15 @@
           community.general.pacman:
             name:
               - accerciser
-              - alacritty
               - anki
               - discord
               - firefox
-              - thunderbird
+              - ghostty
               - noto-fonts-cjk
               - noto-fonts-emoji
               - podman-desktop
               - solaar
+              - thunderbird
               - ttf-jetbrains-mono-nerd
 
         - name: Ensure fontconfig is set
