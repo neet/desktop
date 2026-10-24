@@ -142,7 +142,7 @@
           - npm
           - podman
           - ripgrep
-          - rust
+          - rustup
           - tmux
           - tree-sitter-cli
           - typescript-language-server
