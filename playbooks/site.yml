@@ -253,8 +253,10 @@
               - anki
               - discord
               - firefox
-              - solaar
+              - thunderbird
               - noto-fonts-cjk
+              - podman-desktop
+              - solaar
               - ttf-jetbrains-mono-nerd
 
         - name: Ensure fontconfig is set
