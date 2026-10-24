@@ -1,33 +1,38 @@
 ---
+# https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_loops.html#extended-loop-variables
 - name: "Install AUR package: {{ aur_name }}"
   vars:
     aur_base: "{{ ansible_facts['user_dir'] }}/.cache/aur"
     aur_workdir: "{{ aur_base }}/{{ aur_name }}"
+
   block:
+    - name: Ensure wheel group can sudo
+      become: true
+      when: ansible_loop.first
+      changed_when: false
+      community.general.sudoers:
+        name: zzz-pacman-nopassword
+        user: "{{ user_name }}"
+        commands: /usr/bin/pacman
+        nopassword: true
+
     - name: "Ensure AUR is cloned"
       ansible.builtin.git:
         repo: https://aur.archlinux.org/{{ aur_name }}.git
         dest: "{{ aur_workdir }}"
         version: "{{ aur_version }}"
 
-    - name: "Ensure AUR is registered to a variable"
-      register: packagelist
-      ansible.builtin.shell:
-        chdir: "{{ aur_workdir }}"
-        # TODO: vscode-langservers-extracted が debug を出力するんだけど生成はされていない。上流のミス？
-        cmd: |
-          set -o pipefail
-          makepkg --packagelist | awk '! /-debug-/'
+    # TODO: 後続のタスクのために「インストールがあったなら changed」にしたい
+    - name: "Ensure AUR is built and installed"
       changed_when: false
-      check_mode: false
-
-    - name: "Ensure AUR is built"
       ansible.builtin.command:
         chdir: "{{ aur_workdir }}"
-        cmd: "makepkg"
-        creates: "{{ packagelist.stdout_lines[0] }}"
+        cmd: "makepkg -si --noconfirm --needed"
 
-    - name: "Ensure AUR is installed"
+    - name: Ensure wheel group cannot sudo
       become: true
-      community.general.pacman:
-        name: "{{ packagelist.stdout_lines }}"
+      when: ansible_loop.last
+      changed_when: false
+      community.general.sudoers:
+        name: zzz-pacman-nopassword
+        state: absent
