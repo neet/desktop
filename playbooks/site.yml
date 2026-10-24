@@ -125,6 +125,7 @@
       become: true
       community.general.pacman:
         name:
+          - clang
           - direnv
           - fastfetch
           - fzf
