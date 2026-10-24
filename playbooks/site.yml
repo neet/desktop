@@ -119,59 +119,6 @@
             backend: opensshbin
 
     ################################################################################
-    # 開発環境のセットアップ
-    ################################################################################
-    - name: Ensure Neovim and related packages are installed
-      become: true
-      community.general.pacman:
-        name:
-          - clang
-          - direnv
-          - fastfetch
-          - fzf
-          - gcc
-          - ghq
-          - git
-          - github-cli
-          - glow
-          - jq
-          - lazygit
-          - less
-          - lua-language-server
-          - neovim
-          - nodejs
-          - npm
-          - podman
-          - ripgrep
-          - rustup
-          - tmux
-          - tree-sitter-cli
-          - typescript-language-server
-          - zsh
-          - zsh-autosuggestions
-          - zsh-completions
-          - zsh-syntax-highlighting
-
-    ################################################################################
-    # dotfiles のセットアップ
-    ################################################################################
-    - name: Ensure dotfiles is up
-      vars:
-        # TODO: ghq のディレクトリを手動で変更してしまっている
-        dotfiles_dir: "{{ ansible_facts['user_dir'] }}/ghq/github.com/neet/dotfiles"
-      block:
-        - name: Ensure dotfiles is cloned # noqa latest
-          ansible.builtin.git:
-            repo: https://github.com/neet/dotfiles
-            dest: "{{ dotfiles_dir }}"
-
-        - name: Ensure setup ran
-          changed_when: false
-          ansible.builtin.command:
-            chdir: "{{ dotfiles_dir }}"
-            cmd: "./setup.sh"
-
-    ################################################################################
     # Bluetooth のセットアップ
     ################################################################################
     - name: Ensure Bluetooth is prepared
@@ -227,28 +174,7 @@
               - xdg-desktop-portal-gnome
               - xdg-user-dirs-gtk
               - yelp
-
-        - name: Ensure gdm is enabled
-          ansible.builtin.service:
-            name: gdm
-            enabled: true
-            state: started
-
-        - name: Ensure GNOME related packages are installed
-          become: true
-          community.general.pacman:
-            name:
-              # Firefox から GNOME extension を入れる
-              - gnome-browser-connector
-              # showtime で H.264 を再生するのに必要
-              - gst-libav
-              # dconf (gsettings の低レベル API)
-              - dconf-editor
-
-        - name: Ensure GUI apps are installed
-          become: true
-          community.general.pacman:
-            name:
+              # 便利ツール
               - accerciser
               - anki
               - discord
@@ -260,6 +186,18 @@
               - solaar
               - thunderbird
               - ttf-jetbrains-mono-nerd
+              # Firefox から GNOME extension を入れる
+              - gnome-browser-connector
+              # showtime で H.264 を再生するのに必要
+              - gst-libav
+              # dconf (gsettings の低レベル API)
+              - dconf-editor
+
+        - name: Ensure gdm is enabled
+          ansible.builtin.service:
+            name: gdm
+            enabled: true
+            state: started
 
         - name: Ensure fontconfig is set
           become: true
@@ -279,6 +217,25 @@
           loop:
             - 1password
             - solaar
+
+    ################################################################################
+    # dotfiles のセットアップ
+    ################################################################################
+    - name: Ensure dotfiles is up
+      vars:
+        # TODO: ghq のディレクトリを手動で変更してしまっている
+        dotfiles_dir: "{{ ansible_facts['user_dir'] }}/ghq/github.com/neet/dotfiles"
+      block:
+        - name: Ensure dotfiles is cloned # noqa latest
+          ansible.builtin.git:
+            repo: https://github.com/neet/dotfiles
+            dest: "{{ dotfiles_dir }}"
+
+        - name: Ensure setup ran
+          changed_when: false
+          ansible.builtin.command:
+            chdir: "{{ dotfiles_dir }}"
+            cmd: "./setup.sh"
 
     ################################################################################
     # AUR のインストール
@@ -311,6 +268,12 @@
             vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
             whitesur-icon-theme: 96a14475f7e05f7e0315b416c7faf03b5f2b5c60
             zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
+
+        - name: Ensure dotfiles meta AUR is installed
+          changed_when: false
+          ansible.builtin.command:
+            chdir: "{{ dotfiles_dir }}"
+            cmd: "makepkg -si"
 
       always:
         - name: Ensure wheel group cannot sudo

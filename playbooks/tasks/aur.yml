@@ -18,4 +18,3 @@
       ansible.builtin.command:
         chdir: "{{ aur_workdir }}"
         cmd: "makepkg -si --noconfirm --needed"
-
