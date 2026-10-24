@@ -255,6 +255,7 @@
               - firefox
               - thunderbird
               - noto-fonts-cjk
+              - noto-fonts-emoji
               - podman-desktop
               - solaar
               - ttf-jetbrains-mono-nerd
