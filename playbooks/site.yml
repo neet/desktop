@@ -200,6 +200,7 @@
           community.general.pacman:
             name:
               # GNOME グループに入っているやつ
+              - decibels
               - gdm
               - gnome-color-manager
               - gnome-control-center
@@ -251,6 +252,7 @@
             name:
               - accerciser
               - anki
+              - audacity
               - discord
               - firefox
               - ghostty
