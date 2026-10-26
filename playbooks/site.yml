@@ -279,7 +279,7 @@
             dest: "{{ ansible_facts['user_dir'] }}/.config/autostart"
             mode: "0644"
           loop:
-            - 1password
+            - com.onepassword.OnePassword
             - solaar
 
     ################################################################################
@@ -304,17 +304,17 @@
             aur_name: "{{ item.key }}"
             aur_version: "{{ item.value }}"
           with_dict:
-            1password: d991324ae2605a3142318cd33fe3d7da6a9f98eb
+            1password: c384584bedaa1ffebd3939d03a52bf4ff48e2bff
             ansible-language-server: 5854855f61c3cef1ce67e0586f7745fd1348cfe7
-            claude-code: c228df23638624076be486c55c697b06e6d1d1d7
-            google-chrome-canary: 7e18a1a01e4d2bbc023242013224b39f7908bf2b
-            ibus-mozc: 25a9f3c5a69617b04330c0efe8fc6cb2c98870fc
-            mozc: 53a13d01af98e3e08f35c49b441cc0fafdaea86f
-            slack-desktop: 1275d6840eb7998cd94ae5d1ea7687c2b219f6e6
+            claude-code: 321b85df68c636bd60164bbedd03d9b187146b27
+            google-chrome-canary: 796f4111229060be4702fd6119c578a35261dc9d
+            mozc: d48b708ff71733503de51c66c7922ba990ee2d38
+            ibus-mozc: 3ee8affa3fad63b6a75605775ad1c918ed4d4d6c
+            slack-desktop: 67c43c14906ddc96749f3c9b682bd9f5894d7251
             vscode-langservers-extracted: 6a5dd717ba64ba85fbaed3f33e34f3184a127b44
             whitesur-icon-theme: 96a14475f7e05f7e0315b416c7faf03b5f2b5c60
             zsh-auto-notify: 051b93d10e2e7b7c0dd497857f4a4df96f40e038
-            zsh-pure-prompt: 6b8c56e594d4a3c53c9bc68d08e1fa64c8fe2648
+            zsh-pure-prompt: b1fb87d3fb219ecbf6ff786d9f59a932e78ed937
 
       always:
         - name: Ensure wheel group cannot sudo
