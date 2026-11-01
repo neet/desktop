@@ -191,6 +191,20 @@
             state: started
 
     ################################################################################
+    # DDC/CI のセットアップ
+    # ddcutil はついでに i2c-* グループを作ったり
+    # i2c_dev カーネルモジュールを読み込んだりするっぽい。
+    ################################################################################
+    - name: Ensure DDC/CI is prepared
+      become: true
+      block:
+        - name: Ensure ddcutil is installed
+          community.general.pacman:
+            name:
+              - linux-headers
+              - ddcutil
+
+    ################################################################################
     # GUI のセットアップ
     ################################################################################
     - name: Ensure GNOME packages are prepared
@@ -315,6 +329,8 @@
             whitesur-icon-theme: 96a14475f7e05f7e0315b416c7faf03b5f2b5c60
             zsh-auto-notify: 051b93d10e2e7b7c0dd497857f4a4df96f40e038
             zsh-pure-prompt: b1fb87d3fb219ecbf6ff786d9f59a932e78ed937
+            # TODO: dkms autoinstall
+            ddcci-driver-linux-dkms-git: 133775e9d9bf4dea4a2c3760b17ed1110cf37172
 
       always:
         - name: Ensure wheel group cannot sudo
