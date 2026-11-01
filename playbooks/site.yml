@@ -169,7 +169,7 @@
           changed_when: false
           ansible.builtin.command:
             chdir: "{{ dotfiles_dir }}"
-            cmd: "./setup.sh"
+            cmd: "./setup"
 
     ################################################################################
     # Bluetooth のセットアップ
