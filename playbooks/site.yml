@@ -28,6 +28,11 @@
         name: avahi-daemon
         state: restarted
 
+    - name: Restart ibus
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: "ibus write-cache; ibus restart"
+
   tasks:
     ################################################################################
     # 環境変数
@@ -323,6 +328,17 @@
           community.general.sudoers:
             name: zzz-pacman-nopassword
             state: absent
+
+    ################################################################################
+    # Mozc を US レイアウトとして使う
+    # https://github.com/neet/desktop/issues/18
+    ################################################################################
+    - name: Ensure Mozc uses US layout
+      notify: Restart ibus
+      ansible.builtin.replace:
+        path: "{{ ansible_facts['user_dir'] }}/.config/mozc/ibus_config.textproto"
+        regexp: 'layout : "default"'
+        replace: 'layout : "us"'
 
     ################################################################################
     # Xremap のインストール
