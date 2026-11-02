@@ -1,14 +1,21 @@
----
 modmap:
   - name: macOS-like IME switch
     remap:
       Super_L:
         held: Super_L
-        alone: Muhenkan
+        alone: F20
         alone_timeout_millis: 300
         free_hold: true
       Super_R:
         held: Super_R
-        alone: Henkan
+        alone: F21
         alone_timeout_millis: 300
         free_hold: true
+
+keymap:
+  - name: IME switch launch
+    remap:
+      F20:
+        launch: ["ibus", "engine", "xkb:us::eng"]
+      F21:
+        launch: ["ibus", "engine", "mozc-on"]

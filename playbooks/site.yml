@@ -350,7 +350,7 @@
         - name: Ensure Xremap is installed
           community.general.cargo:
             name: xremap
-            version: 0.10.7
+            version: 0.15.16
             features: [gnome]
 
         - name: Ensure Xremap config is copied
