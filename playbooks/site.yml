@@ -89,6 +89,17 @@
             state: started
 
     ################################################################################
+    # wpt のために hosts を編集
+    # https://web-platform-tests.org/running-tests/from-local-system.html#hosts-file-setup
+    ################################################################################
+    - name: Ensure config for WPT is in the hosts
+      become: true
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: "{{ lookup('ansible.builtin.file', 'files/wpt-hosts') }}"
+        marker: "# {mark} web-platform-tests hosts"
+
+    ################################################################################
     # ユーザーを作る
     ################################################################################
     - name: Ensure user is prepared
